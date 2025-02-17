@@ -1,3 +1,5 @@
+// server.js
+
 const dotenv = require('dotenv');
 dotenv.config();
 const express = require('express');
@@ -8,6 +10,11 @@ const morgan = require('morgan');
 const session = require('express-session');
 
 const authController = require('./controllers/auth.js');
+
+const isSignedIn = require('./middleware/is-signed-in.js');
+const passUserToView = require('./middleware/pass-user-to-view.js');
+
+const applicationsController = require('./controllers/applications.js');
 
 const port = process.env.PORT ? process.env.PORT : '3000';
 
@@ -28,21 +35,40 @@ app.use(
   })
 );
 
+// -------------------------------------------------------------- middleware??
+
+app.use(passUserToView);
+
+
+
+// -------------------------------------------------------------- routes
+
 app.get('/', (req, res) => {
-  res.render('index.ejs', {
-    user: req.session.user,
-  });
-});
-
-app.get('/vip-lounge', (req, res) => {
+  //check if user is signed in
   if (req.session.user) {
-    res.send(`Welcome to the party ${req.session.user.username}.`);
+    // redirect signed-in users to their application index
+    res.redirect(`/users/${req.session.user._id}/applications`);
   } else {
-    res.send('Sorry, no guests allowed.');
-  }
+    // show homepage for those not signed in
+    res.render('index.ejs');
+  };
 });
 
-app.use('/auth', authController);
+// app.get('/vip-lounge', (req, res) => {
+//   if (req.session.user) {
+//     res.send(`Welcome to the party ${req.session.user.username}.`);
+//   } else {
+//     res.send('Sorry, no guests allowed.');
+//   }
+// });
+
+app.use('/auth', authController); // should this go up with the middleware?
+
+app.use(isSignedIn); // should this go up with the middleware?
+
+app.use('/users/:userId/applications', applicationsController);
+
+// -------------------------------------------------------------- port listener
 
 app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);
