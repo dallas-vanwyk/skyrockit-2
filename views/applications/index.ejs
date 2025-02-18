@@ -10,7 +10,19 @@
 </head>
 
 <body>
+    <%- include('../partials/_navbar.ejs') %>
     <h1>Your Job Apps</h1>
+    <a href="/users/<%= user._id %>/applications/new">Add a new job app</a>
+    <br>
+
+    <ol>
+        <% applications.forEach((application) => { %>
+            <a href="/users/<%= user._id %>/applications/<%= application._id %>">
+                <li><%= application.title %> at <%= application.company %></li>
+            </a>
+        <% }) %>
+    </ol>
+
 </body>
 
 </html>
