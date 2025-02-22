@@ -54,14 +54,6 @@ app.get('/', (req, res) => {
   };
 });
 
-// app.get('/vip-lounge', (req, res) => {
-//   if (req.session.user) {
-//     res.send(`Welcome to the party ${req.session.user.username}.`);
-//   } else {
-//     res.send('Sorry, no guests allowed.');
-//   }
-// });
-
 app.use('/auth', authController); // should this go up with the middleware?
 
 app.use(isSignedIn); // should this go up with the middleware?
